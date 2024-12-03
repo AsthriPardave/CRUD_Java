@@ -56,6 +56,24 @@ public class Ropa {
         
         return nvoArreglo;
     } 
+    
+    public static Ropa buscarRopa(Ropa []arreglo, String codigo){
+        for(int i = 0; i<arreglo.length; i++ ){
+            if(codigo == null ? arreglo[i].getCodigo() == null : codigo.equals(arreglo[i].getCodigo())){
+                return arreglo[i];
+            }
+        }
+        return null;
+    }
+    
+    public static Ropa[] actualizarRopa(Ropa []arreglo, Ropa ropa){
+        for(int i = 0; i<arreglo.length; i++ ){
+            if(ropa.getCodigo() == null ? arreglo[i].getCodigo() == null : ropa.getCodigo().equals(arreglo[i].getCodigo())){
+               arreglo[i] = ropa;
+            }
+        }
+        return arreglo;
+    }
         
     public String getMarca() {
         return marca;

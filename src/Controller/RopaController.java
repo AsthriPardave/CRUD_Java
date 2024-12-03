@@ -8,6 +8,7 @@ import Model.Ropa;
 import View.RopaView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -17,6 +18,7 @@ import javax.swing.table.DefaultTableModel;
 public class RopaController {
     RopaView fr;
     Ropa [] ropas;
+    Ropa ropa;
     
     public RopaController(){
        fr = new RopaView();
@@ -34,11 +36,17 @@ public class RopaController {
                 String talla = (String) fr.cbTalla.getSelectedItem();
                 int stock = (int) fr.InputStock.getValue();
                 
-                Ropa ropa = new Ropa(codigo, marca, modelo, talla, tipo, color, stock);
-                //If registration success, reloads the table and clear all input fields
-                
-                ropas = Ropa.agregarRopa(ropas, ropa);
-                llenarTabla();
+                if("".equals(codigo) || "".equals(modelo) || "".equals(marca) || "".equals(tipo) || "".equals(color) || "".equals(talla) || stock < 0){
+                    JOptionPane.showMessageDialog(fr, "Llenar todos los campos");
+                    
+                } else if(Ropa.buscarRopa(ropas, codigo) != null){
+                    JOptionPane.showMessageDialog(fr, "Código existente, escribe otro");
+                }else {
+                    Ropa ropa = new Ropa(codigo, marca, modelo, talla, tipo, color, stock);
+                    //If registration success, reloads the table and clear all input fields
+                    ropas = Ropa.agregarRopa(ropas, ropa);
+                    llenarTabla();
+                }
             }
         });
        
@@ -46,20 +54,25 @@ public class RopaController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String id = fr.InputCodigo.getText();
-                for(int i = 0; i<ropas.length; i++ ){
-                    if(id == null ? ropas[i].getCodigo() == null : id.equals(ropas[i].getCodigo())){
-                        fr.InputCodigo.setText(ropas[i].getCodigo());
-                        fr.InputModelo.setText(ropas[i].getModelo());
-                        fr.InputMarca.setText(ropas[i].getMarca());
-                        fr.InputTipo.setText(ropas[i].getTipo());
-                        fr.InputColor.setText(ropas[i].getColor());
-                        fr.cbTalla.setSelectedItem(ropas[i].getTalla());
-                        fr.InputStock.setValue(ropas[i].getStock());
+                if("".equals(id)){
+                    JOptionPane.showMessageDialog(fr, "Escribe el codigo que quieres buscar, idiota");
+                } else {
+                    ropa = Ropa.buscarRopa(ropas, id);
+                    if(ropa == null ){
+                        JOptionPane.showMessageDialog(fr, "Ay, ese codigo de ropa no existe, escribe bien oe");
+                    } else {
+                        fr.InputCodigo.setText(ropa.getCodigo());
+                        fr.InputModelo.setText(ropa.getModelo());
+                        fr.InputMarca.setText(ropa.getMarca());
+                        fr.InputTipo.setText(ropa.getTipo());
+                        fr.InputColor.setText(ropa.getColor());
+                        fr.cbTalla.setSelectedItem(ropa.getTalla());
+                        fr.InputStock.setValue(ropa.getStock());
                     }
-                }    
+                }
             }
         });
-       
+                            
        this.fr.BtnActualizar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -70,12 +83,14 @@ public class RopaController {
                 String color = fr.InputColor.getText();
                 String talla = (String) fr.cbTalla.getSelectedItem();
                 int stock = (int) fr.InputStock.getValue();
-                for(int i = 0; i<ropas.length; i++ ){
-                    if(codigo == null ? ropas[i].getCodigo() == null : codigo.equals(ropas[i].getCodigo())){
-                        ropas[i] = new Ropa(codigo, marca, modelo, talla, tipo, color, stock);
-                    }
-                }    
-                llenarTabla();
+                Ropa ropa = new Ropa(codigo, marca, modelo, talla, tipo, color, stock);
+                
+                if("".equals(codigo) || "".equals(modelo) || "".equals(marca) || "".equals(tipo) || "".equals(color) || "".equals(talla) || stock < 0){
+                    JOptionPane.showMessageDialog(fr, "Llena todos los campos crj");   
+                } else {
+                    ropas = Ropa.actualizarRopa(ropas, ropa);
+                    llenarTabla();
+                }
             }
         });
        
@@ -83,8 +98,14 @@ public class RopaController {
             @Override
             public void actionPerformed(ActionEvent e) {
                String id = fr.InputCodigo.getText();
-               ropas = Ropa.eliminarRopa(ropas, id);
-               llenarTabla(); 
+               if("".equals(id)){
+                   JOptionPane.showMessageDialog(fr, "Escribe el codigo del producto que quieres eliminar");
+               } else if(Ropa.buscarRopa(ropas, id) != null){
+                   ropas = Ropa.eliminarRopa(ropas, id);
+                   llenarTabla();   
+               } else {
+                   JOptionPane.showMessageDialog(fr, "No existe este código");
+               }
             }
         });
     }
@@ -108,8 +129,5 @@ public class RopaController {
         fr.InputModelo.setText("");
         fr.InputTipo.setText("");
         fr.InputStock.setValue(0);
-    }
-    
-    
-    
+    }  
 }
